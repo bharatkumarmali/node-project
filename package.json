@@ -1,0 +1,15 @@
+{
+  "name": "backend-prject-1",
+  "version": "1.0.0",
+  "description": "its first project in node js backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mali",
+    "coder"
+  ],
+  "author": "Bhartr Mali",
+  "license": "ISC"
+}
