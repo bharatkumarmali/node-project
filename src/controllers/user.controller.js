@@ -103,7 +103,7 @@ const logedInUser = asyncHandler(async (req, res) => {
     // req.body -> data (username or email, password)
     const { username, email, password } = req.body;
 
-    console.log("email ----------- ", req.body)
+    console.log("req.body ----------- ", req.body)
 
     // email or username is required
     // if (!(username || email)) {
@@ -172,7 +172,9 @@ const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            refreshToken: undefined
+            $set: {
+                refreshToken: undefined
+            }
         },
         {
             new: true
@@ -186,8 +188,8 @@ const logoutUser = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", refreshToken, options)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
         .json(
             new ApiResponse(200, {}, "User logged out successfully")
         )
