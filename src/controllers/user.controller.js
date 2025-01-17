@@ -199,7 +199,6 @@ const regenerateAccessToken = asyncHandler(async (req, res) => {
     try {
         const incomingRefreshToken = await req.cookies.refreshToken || req.body.refreshToken
 
-
         if (!incomingRefreshToken) {
             return res.status(401).json(
                 new ApiError(401, "unauthorized request")
@@ -222,25 +221,28 @@ const regenerateAccessToken = asyncHandler(async (req, res) => {
             )
         }
 
-        const { accessToken, refreshToken } = await generateAccessAndRefreshToken(decodedToken?._id)
-
+        const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user?._id)
 
         const options = {
             httpOnly: true,
             secure: true
         }
 
-        req.status(200)
+        return res
+            .status(200)
             .cookie("accessToken", accessToken, options)
             .cookie("refreshToken", refreshToken, options)
             .json(
                 new ApiResponse(200,
-                    { accessToken, refreshToken: refreshToken },
+                    { accessToken, refreshToken },
                     "access token regenerated successfully"
                 )
             )
+
     } catch (error) {
-        return new ApiError(500, error?.message || "something went wrong while regenerating access token")
+        return res.status(500).json(
+            new ApiError(500, error?.message || "something went wrong while regenerating access token")
+        )
     }
 })
 
