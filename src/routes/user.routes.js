@@ -20,17 +20,13 @@ router.route("/logout").post(verifyJWT, logoutUser)
 router.route("/regenerate-access-token").post(regenerateAccessToken)
 
 router.route("/change-password").post(verifyJWT, changeUserPasswod)
-
 router.route("/details").get(verifyJWT, getCurrentUser)
+router.route("/update").patch(verifyJWT, updateAccountDetails)
 
-router.route("/update").post(verifyJWT, updateAccountDetails)
+router.route("/update-avatar").patch(verifyJWT, upload.single("avatar"), updateUserAvatar)
+router.route("/update-cover-image").patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage)
 
-router.route("/update-avatar").post(verifyJWT, upload.single("avatar"), updateUserAvatar)
-
-router.route("/update-cover-image").post(verifyJWT, upload.single("coverImage"), updateUserCoverImage)
-
-router.route("/channel-profile").post(verifyJWT, getUserChannelsProfile)
-
-router.route("/watch-history").post(verifyJWT, getWatchHistory)
+router.route("/channel/:username").get(verifyJWT, getUserChannelsProfile)
+router.route("/watch-history").get(verifyJWT, getWatchHistory)
 
 export { router as userRouter }

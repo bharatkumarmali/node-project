@@ -378,7 +378,6 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
 const getUserChannelsProfile = asyncHandler(async (req, res) => {
     const { username } = req.params
-    // const username = "bharatmali"
 
     if (!username?.trim()) {
         return res.status(400).json(
