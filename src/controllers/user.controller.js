@@ -1,11 +1,12 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import ApiError from "../utils/ApiError.js"
-import ApiResponse from "../utils/ApiResponse.js"
+import { ApiError } from "../utils/ApiError.js"
+import { ApiResponse } from "../utils/ApiResponse.js"
 import { User } from "../models/user.models.js"
-import uploadOnCloudinary from "../utils/cloudinary.js"
+import {uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js"
 import jwt from "jsonwebtoken"
 import { Subscription } from "../models/subscrioption.modles.js";
 import mongoose from "mongoose";
+import { Todo } from "../models/todo.models.js";
 
 
 const generateAccessAndRefreshToken = async (userId) => {
@@ -502,6 +503,53 @@ const getWatchHistory = asyncHandler(async (req, res) => {
 })
 
 
+const deleteUser = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    if (!id) {
+        return res.status(400).json(
+            new ApiError(400, "User ID is required")
+        )
+    }
+
+    const user = await User.findById(id)
+
+
+    if (!user) {
+        return res.status(404).json(
+            new ApiError(404, "User not found")
+        )
+    }
+
+    // Delete avatar and cover image from cloudinary
+    if (user.avatar) {
+        await deleteFromCloudinary(user.avatar)
+    }
+    
+    if (user.coverImage) {
+        await deleteFromCloudinary(user.coverImage)
+    }
+
+    // Delete user from database
+    await user.deleteOne()
+
+    // Delete all todos of the user
+    await Todo.deleteMany({ user_id: user._id })
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res.status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(
+            new ApiResponse(200, null, "User deleted successfully")
+        )
+})
+
+
 export {
     registerUser,
     logedInUser,
@@ -513,5 +561,6 @@ export {
     updateUserAvatar,
     updateUserCoverImage,
     getUserChannelsProfile,
-    getWatchHistory
+    getWatchHistory,
+    deleteUser
 }
